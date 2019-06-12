@@ -107,7 +107,7 @@ The value `us` is included in the request header `locale` going out from the pro
 ### Example 2: Load external lua library
 [example-2-lib](./example-2-lib)
 
-Loads a library [uuid.lua](./example-2-lib/uuid.lua)
+Loads the library [./example-2-lib/uuid.lua](./example-2-lib/uuid.lua)
 
 Adds a header with a random uuid if the header is not already present in the request
 
@@ -125,6 +125,38 @@ The random uuid is included in the request header `correlationid` going out from
   "method": "GET",
   "body": "",
   "protocol": "http"
+}
+```
+
+### Example 3: Parse body JSON
+[example-3-json](./example-3-json)
+
+Loads the library [./example-3-json/JSON.lua](./example-3-json/JSON.lua)
+
+Adds a header using the value from the body if the header is not already present in the request.
+
+Send the request POST with an `application/json` body:
+```
+curl -d '{"correlationid":"GEN-00000000-1111-2222-3333-444444444444"}' \
+-H "Content-Type:application/json" \
+http://localhost:8000
+```
+
+The value from the body field `correlationid` is included in the request header `correlationid` going out from the proxy to the web service
+```json
+{
+  "path": "/",
+  "headers": {
+    "host": "localhost:8000",
+    "user-agent": "curl/7.54.0",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "content-length": "60",
+    "correlationid": "GEN-00000000-1111-2222-3333-444444444444"
+  },
+  "method": "POST",
+  "body": "{\"correlationid\":\"GEN-00000000-1111-2222-3333-444444444444\"}",
+  "protocol": "http",
 }
 ```
 
