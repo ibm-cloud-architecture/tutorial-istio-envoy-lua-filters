@@ -74,7 +74,7 @@ Curl output should include our headers:
 To run the examples change directory and run normal docker-compose up/down assuming you already pull and build
 
 Run the example 1:
-```
+```bash
 cd example-1-query
 docker-compose up
 ```
@@ -111,7 +111,10 @@ Loads the library [./example-2-lib/uuid.lua](./example-2-lib/uuid.lua)
 
 Adds a header with a random uuid if the header is not already present in the request
 
-Send the request `curl "localhost:8000/api/v1"`
+Send the request
+```bash
+curl "localhost:8000/api/v1"
+```
 
 The random uuid is included in the request header `correlationid` going out from the proxy to the web service
 ```json
@@ -136,7 +139,7 @@ Loads the library [./example-3-json/JSON.lua](./example-3-json/JSON.lua)
 Adds a header using the value from the body if the header is not already present in the request.
 
 Send the request POST with an `application/json` body:
-```
+```bash
 curl -d '{"correlationid":"GEN-00000000-1111-2222-3333-444444444444"}' \
 -H "Content-Type:application/json" \
 http://localhost:8000
@@ -174,7 +177,7 @@ Detects if any of the headers (`locale`,`brand`,`systemid`,`correlationid`) are 
 If correlationid is not present at all then a new value is generated using a random uuid.
 
 Send the request POST with an `application/json` body:
-```
+```bash
 curl -d '{"systemid":"FFEE"}' \
 -H "Content-Type:application/json" \
 "http://localhost:8000/api/v1?brand=acme&locale=en-us"
