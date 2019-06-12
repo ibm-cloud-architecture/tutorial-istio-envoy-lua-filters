@@ -81,6 +81,7 @@ docker-compose up
 
 ### Example 1: Query Param
 [example-1-query](./example-1-query)
+
 Parse a query parameter and add the value as a header into the request
 
 Send the request `curl "localhost:8000/api?locale=us"`
@@ -100,7 +101,30 @@ The value `us` is included in the request header `locale` going out from the pro
   "query": {
     "locale": "pr"
   },
-  }
+}
+```
+
+### Example 2: Load external lua library
+[example-2-lib](./example-2-lib)
+
+Loads a library [uuid.lua](./example-2-lib/uuid.lua)
+
+Adds a header with a random uuid if the header is not already present in the request
+
+Send the request `curl "localhost:8000/api/v1"`
+
+The random uuid is included in the request header `correlationid` going out from the proxy to the web service
+```json
+{
+  "path": "/api",
+  "headers": {
+    "host": "localhost:8000",
+    "user-agent": "curl/7.54.0",
+    "correlationid": "GEN-cbb297c0-14a9-46bc-c691-1d0ef9b42df9"
+  },
+  "method": "GET",
+  "body": "",
+  "protocol": "http"
 }
 ```
 
