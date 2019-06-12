@@ -55,10 +55,10 @@ static_resources:
                   brand = headers:get("brand")
                   systemid = headers:get("systemid")
                   correlationid = headers:get("correlationid")
-                  request_handle:logDebug("*******debug The content-type"..content_type)
-                  request_handle:logDebug("******* The body is application json")
+                  request_handle:logDebug("******* The content-type"..content_type)
                   lua_value = {}
                   if content_type == "application/json" then
+                    request_handle:logDebug("******* The body is application json")
                     body = request_handle:body()
                     body_size = body:length()
                     body_bytes = body:getBytes(0, body_size)
@@ -76,7 +76,6 @@ static_resources:
                   end
                   if  brand == nil then
                     if query_params["brand"] ~= nil then
-                      request_handle:logDebug("******* replacing brand with query "..query_params["brand"])
                       request_handle:headers():replace("brand",query_params["brand"])
                     else
                       if lua_value.brand ~= nil then

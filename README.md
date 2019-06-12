@@ -160,3 +160,57 @@ The value from the body field `correlationid` is included in the request header 
 }
 ```
 
+### Example 4: Full Example
+[example-3-json](./example-3-json)
+
+Full complex example parsing headers, query, body, and generating uuid
+
+Loads the libraries:
+- [./example-3-json/JSON.lua](./example-3-json/JSON.lua)
+- [./example-2-lib/uuid.lua](./example-2-lib/uuid.lua)
+
+Detects if any of the headers (`locale`,`brand`,`systemid`,`correlationid`) are missing, tries to add the header with the value from query parameter or body json.
+
+If correlationid is not present at all then a new value is generated using a random uuid.
+
+Send the request POST with an `application/json` body:
+```
+curl -d '{"systemid":"FFEE"}' \
+-H "Content-Type:application/json" \
+"http://localhost:8000/api/v1?brand=acme&locale=en-us"
+```
+
+The request will include all the missing headers going from the proxy to the web service.
+```json
+{
+"locale": "en-us",
+"brand": "acme",
+"systemid": "FFEE",
+"correlationid": "GEN-cbb297c0-14a9-46bc-c691-1d0ef9b42df9"
+}
+```
+Full request echo back from web service:
+```json
+{
+  "path": "/api/v1",
+  "headers": {
+    "host": "localhost:8000",
+    "user-agent": "curl/7.54.0",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "content-length": "19",
+    "locale": "en-us",
+    "brand": "acme",
+    "systemid": "FFEE",
+    "correlationid": "GEN-cbb297c0-14a9-46bc-c691-1d0ef9b42df9",
+  },
+  "method": "POST",
+  "body": "{\"systemid\":\"FFEE\"}",
+  "protocol": "http",
+  "query": {
+    "brand": "acme",
+    "locale": "en-us"
+  },
+}
+```
+
