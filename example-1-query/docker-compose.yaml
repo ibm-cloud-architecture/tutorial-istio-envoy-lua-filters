@@ -6,9 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile-proxy
     volumes:
-      - ./example-4-full.yaml:/etc/envoy.yaml
-      - ./JSON.lua:/var/lib/JSON.lua
-      - ./uuid.lua:/var/lib/uuid.lua
+      - ./envoy.yaml:/etc/envoy.yaml
     networks:
       - envoymesh
     expose:

@@ -36,6 +36,8 @@ Curl output should include our headers:
 < response-body-size: 544            <-- This is added to the response header by our Lua script. --<
 < server: envoy
 <
+```
+```json
 {
   "path": "/",
   "headers": {
@@ -61,6 +63,44 @@ Curl output should include our headers:
   "os": {
     "hostname": "5ad758105577"
   }
+```
+```
 * Connection #0 to host localhost left intact
 }
 ```
+
+## Additional Examples
+
+To run the examples change directory and run normal docker-compose up/down assuming you already pull and build
+
+Run the example 1:
+```
+cd example-1-query
+docker-compose up
+```
+
+### Example 1: Query Param
+[example-1-query](./example-1-query)
+Parse a query parameter and add the value as a header into the request
+
+Send the request `curl "localhost:8000/api?locale=us"`
+
+The value `us` is included in the request header `locale` going out from the proxy to the web service
+```json
+{
+  "path": "/api",
+  "headers": {
+    "host": "localhost:8000",
+    "user-agent": "curl/7.54.0",
+    "locale": "pr",
+  },
+  "method": "GET",
+  "body": "",
+  "protocol": "http",
+  "query": {
+    "locale": "pr"
+  },
+  }
+}
+```
+
