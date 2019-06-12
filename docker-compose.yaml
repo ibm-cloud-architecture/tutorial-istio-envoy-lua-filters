@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile-proxy
+    volumes:
+      - ./example-4-full.yaml:/etc/envoy.yaml
+      - ./JSON.lua:/var/lib/JSON.lua
+      - ./uuid.lua:/var/lib/uuid.lua
+    networks:
+      - envoymesh
+    expose:
+      - "80"
+      - "8001"
+    ports:
+      - "8000:80"
+      - "8001:8001"
+
+  web_service:
+    build:
+      context: .
+      dockerfile: Dockerfile-web-service
+    networks:
+      envoymesh:
+        aliases:
+          - web_service
+    expose:
+      - "80"
+    ports:
+      - "8080:80"
+
+networks:
+  envoymesh: {}

@@ -1,0 +1,133 @@
+static_resources:
+  listeners:
+  - name: main
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 80
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+          stat_prefix: ingress_http
+          codec_type: auto
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: local_service
+              domains:
+              - "*"
+              routes:
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: web_service
+          http_filters:
+          - name: envoy.lua
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.filter.http.lua.v2.Lua
+              inline_code: |
+                JSON = (loadfile "/var/lib/JSON.lua")() -- one-time load of the routines
+                uuid = (loadfile "/var/lib/uuid.lua")() -- one-time load of the routines
+                function envoy_on_request(request_handle)
+                  function urldecode(s)
+                    s = s:gsub('+', ' ')
+                        :gsub('%%(%x%x)', function(h)
+                                            return string.char(tonumber(h, 16))
+                                          end)
+                    return s
+                  end
+                  function parseurl(s)
+                    local ans = {}
+                    for k,v in s:gmatch('([^&=?]-)=([^&=?]+)' ) do
+                      ans[ k ] = urldecode(v)
+                    end
+                    return ans
+                  end
+
+                  headers = request_handle:headers()
+                  path = headers:get(":path")
+                  method = headers:get(":method")
+                  query_params = parseurl(path)
+                  content_type = headers:get("content-type")
+                  locale = headers:get("locale")
+                  brand = headers:get("brand")
+                  systemid = headers:get("systemid")
+                  correlationid = headers:get("correlationid")
+                  request_handle:logDebug("*******debug The content-type"..content_type)
+                  request_handle:logDebug("******* The body is application json")
+                  lua_value = {}
+                  if content_type == "application/json" then
+                    body = request_handle:body()
+                    body_size = body:length()
+                    body_bytes = body:getBytes(0, body_size)
+                    raw_json_text = tostring(body_bytes)
+                    lua_value = JSON:decode(raw_json_text) -- decode example
+                  end
+                  if locale == nil then
+                    if query_params["locale"] ~= nil then
+                      request_handle:headers():replace("locale",query_params["locale"])
+                    else
+                      if lua_value.locale ~= nil then
+                        request_handle:headers():replace("locale",lua_value.locale)
+                      end
+                    end
+                  end
+                  if  brand == nil then
+                    if query_params["brand"] ~= nil then
+                      request_handle:logDebug("******* replacing brand with query "..query_params["brand"])
+                      request_handle:headers():replace("brand",query_params["brand"])
+                    else
+                      if lua_value.brand ~= nil then
+                        request_handle:headers():replace("brand",lua_value.brand)
+                      end
+                    end
+                  end
+                  if systemid == nil then
+                    if query_params["systemid"] ~= nil then
+                      request_handle:headers():replace("systemid",query_params["systemid"])
+                    else
+                      if lua_value.systemid ~= nil then
+                        request_handle:headers():replace("systemid",lua_value.systemid)
+                      end
+                    end
+                  end
+                  if correlationid == nil then
+                    if method == "GET" or method == "DELETE" then
+                      if query_params["correlationid"] ~= nil then
+                        request_handle:headers():replace("correlationid",query_params["correlationid"])
+                      end
+                    else
+                      if lua_value.correlationid ~= nil then
+                        request_handle:headers():replace("correlationid",lua_value.correlationid)
+                      else
+                        -- generate a new "correlationid"
+                        request_handle:headers():replace("correlationid","GEN-"..uuid())
+                      end
+                    end
+                  end
+                end
+          - name: envoy.router
+            typed_config: {}
+
+  clusters:
+  - name: web_service
+    connect_timeout: 0.25s
+    type: strict_dns # static
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: web_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: web_service
+                port_value: 80
+admin:
+  access_log_path: "/dev/null"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 8001
