@@ -2,6 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
   name: custom-filter
+  namespace: istio-system
 spec:
   filters:
   - listenerMatch:
@@ -29,7 +30,7 @@ spec:
             end
             return ans
           end
-          request_handle:headers():replace("carlos","debug-4")
+          request_handle:headers():replace("debug-carlos","debug with folks on slack 23")
           local headers = request_handle:headers()
           local path = headers:get(":path")
           local method = headers:get(":method")
