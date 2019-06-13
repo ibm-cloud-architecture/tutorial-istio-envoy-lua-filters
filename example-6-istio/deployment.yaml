@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  web
+  labels:
+    app: web
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v1
+    spec:
+      containers:
+        - name: web-container
+          image: solsson/http-echo
+          ports:
+            - containerPort: 80

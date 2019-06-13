@@ -241,3 +241,47 @@ curl -d '{"systemid":"FFEE"}' \
 "http://localhost:8000/api/v1?brand=acme&locale=en-us"
 ```
 
+### Example 6: Istio Example
+[example-6-istio](./example-6-istio)
+
+This example shows how to store the lua files in a ConfigMap, then mounting in envoy container
+
+Deploy config-map, deployment, and services
+```bash
+cd example-6-istio/
+kubectl apply -f .
+```
+
+Update the deployment `istio-ingressgateway` to add the lua files
+```
+kubectl edit deployment istio-ingressgateway -n istio-system
+```
+Add the volumenMounts in the corresponding section in the container `proxy`
+```yaml
+volumeMounts:
+- mountPath: /var/lib/lua
+  name: config-volume-lua
+```
+Add the volume in the corresponding section in the container `proxy`
+```yaml
+volumes:
+- configMap:
+    name: lua-libs
+    items:
+    - key: JSON.lua
+      path: JSON.lua
+    - key: uuid.lua
+      path: uuid.lua
+```
+
+Open a port forward to reach the `istio-ingressgateway`
+```bash
+kubectl port-forward service/istio-ingressgateway 8000:80 -n istio-system
+```
+
+Now send a request similar as example 4:
+```bash
+curl -v -d '{"systemid":"FFEE"}' \
+-H "Content-Type:application/json" \
+"http://localhost:8000/api/v1?brand=acme&locale=en-us"
+```
