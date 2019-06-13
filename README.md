@@ -223,19 +223,15 @@ Full request echo back from web service:
 
 This example shows how to store the lua files in a ConfigMap, then mounting in envoy container
 
-Create the config map
+Deploy config-map, deployment, and services
 ```bash
-kubectl create configmap lua-libs --from-file=JSON.lua --from-file=uuid.lua --from-file=envoy.yaml 
-```
-
-Deploy services and pods
-```bash
-kubectl apply -f deployment.yaml
+cd example-5-kubernetes/
+kubectl apply -k .
 ```
 
 Open a port forward to reach the envoy provice service
 ```bash
-kubectl port-forward service/proxy-service 8000:80
+kubectl port-forward service/envoy-service 8000:80
 ```
 
 Now send a request similar as example 4:

@@ -1,0 +1,10 @@
+configMapGenerator:
+- name: lua-libs
+  files:
+  - lua/JSON.lua
+  - lua/uuid.lua
+  - lua/envoy.yaml
+
+resources:
+- deployment.yaml
+- service.yaml

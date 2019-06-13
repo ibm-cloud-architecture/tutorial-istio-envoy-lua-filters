@@ -1,68 +1,68 @@
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: web-service
-spec:
-  selector:
-    app: web
-  ports:
-  - name: http
-    port: 80
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: web
+  name:  web
   labels:
     app: web
+    version: v1
 spec:
-  containers:
-    - name: web-container
-      image: solsson/http-echo
-      ports:
-        - containerPort: 80 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: proxy-service
-spec:
+  replicas: 1
   selector:
-    app: envoy
-  ports:
-  - name: http
-    port: 80
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v1
+    spec:
+      containers:
+        - name: web-container
+          image: solsson/http-echo
+          ports:
+            - containerPort: 80
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: envoy
+  name:  envoy
   labels:
     app: envoy
+    version: v1
 spec:
-  containers:
-    - name: envoy-container
-      image: envoyproxy/envoy-dev:latest
-      command: [ "/usr/local/bin/envoy", "-c", "/etc/config/envoy.yaml", "-l", "debug", "--service-cluster", "proxy" ]
-      ports:
-        - containerPort: 80
-      volumeMounts:
-      - name: config-volume-lua
-        mountPath: /var/lib/lua
-      - name: config-volume
-        mountPath: /etc/config
-  volumes:
-    - name: config-volume-lua
-      configMap:
-        name: lua-libs
-        items:
-        - key: JSON.lua
-          path: JSON.lua
-        - key: uuid.lua
-          path: uuid.lua
-    - name: config-volume
-      configMap:
-        name: lua-libs
-        items:
-        - key: envoy.yaml
-          path: envoy.yaml    
+  replicas: 1
+  selector:
+    matchLabels:
+      app: envoy
+  template:
+    metadata:
+      labels:
+        app: envoy
+        version: v1
+    spec:
+      containers:
+        - name: envoy-container
+          image: envoyproxy/envoy-dev:latest
+          command: [ "/usr/local/bin/envoy", "-c", "/etc/config/envoy.yaml", "-l", "debug", "--service-cluster", "proxy" ]
+          ports:
+            - containerPort: 80
+          volumeMounts:
+          - name: config-volume-lua
+            mountPath: /var/lib/lua
+          - name: config-volume
+            mountPath: /etc/config
+      volumes:
+        - name: config-volume-lua
+          configMap:
+            name: lua-libs
+            items:
+            - key: JSON.lua
+              path: JSON.lua
+            - key: uuid.lua
+              path: uuid.lua
+        - name: config-volume
+          configMap:
+            name: lua-libs
+            items:
+            - key: envoy.yaml
+              path: envoy.yaml
