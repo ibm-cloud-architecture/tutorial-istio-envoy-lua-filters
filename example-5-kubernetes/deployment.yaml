@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  selector:
+    app: web
+  ports:
+  - name: http
+    port: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  containers:
+    - name: web-container
+      image: solsson/http-echo
+      ports:
+        - containerPort: 80 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-service
+spec:
+  selector:
+    app: envoy
+  ports:
+  - name: http
+    port: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: envoy
+  labels:
+    app: envoy
+spec:
+  containers:
+    - name: envoy-container
+      image: envoyproxy/envoy-dev:latest
+      command: [ "/usr/local/bin/envoy", "-c", "/etc/config/envoy.yaml", "-l", "debug", "--service-cluster", "proxy" ]
+      ports:
+        - containerPort: 80
+      volumeMounts:
+      - name: config-volume-lua
+        mountPath: /var/lib/lua
+      - name: config-volume
+        mountPath: /etc/config
+  volumes:
+    - name: config-volume-lua
+      configMap:
+        name: lua-libs
+        items:
+        - key: JSON.lua
+          path: JSON.lua
+        - key: uuid.lua
+          path: uuid.lua
+    - name: config-volume
+      configMap:
+        name: lua-libs
+        items:
+        - key: envoy.yaml
+          path: envoy.yaml    

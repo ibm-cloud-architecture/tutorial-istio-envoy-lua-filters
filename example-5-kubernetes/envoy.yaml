@@ -28,8 +28,8 @@ static_resources:
             typed_config:
               "@type": type.googleapis.com/envoy.config.filter.http.lua.v2.Lua
               inline_code: |
-                JSON = (loadfile "/var/lib/JSON.lua")() -- one-time load of the routines
-                uuid = (loadfile "/var/lib/uuid.lua")() -- one-time load of the routines
+                JSON = (loadfile "/var/lib/lua/JSON.lua")() -- one-time load of the routines
+                uuid = (loadfile "/var/lib/lua/uuid.lua")() -- one-time load of the routines
                 function envoy_on_request(request_handle)
                   function urldecode(s)
                     s = s:gsub('+', ' ')
@@ -121,7 +121,7 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: web_service
+                address: web-service
                 port_value: 80
 admin:
   access_log_path: "/dev/null"
