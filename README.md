@@ -93,13 +93,13 @@ The value `us` is included in the request header `locale` going out from the pro
   "headers": {
     "host": "localhost:8000",
     "user-agent": "curl/7.54.0",
-    "locale": "pr",
+    "locale": "us",
   },
   "method": "GET",
   "body": "",
   "protocol": "http",
   "query": {
-    "locale": "pr"
+    "locale": "us"
   },
 }
 ```
@@ -164,13 +164,14 @@ The value from the body field `correlationid` is included in the request header 
 ```
 
 ### Example 4: Full Example
-[example-3-json](./example-3-json)
+[example-4-full](./example-4-full)
 
 Full complex example parsing headers, query, body, and generating uuid
 
 Loads the libraries:
-- [./example-3-json/JSON.lua](./example-3-json/JSON.lua)
 - [./example-2-lib/uuid.lua](./example-2-lib/uuid.lua)
+- [./example-3-json/JSON.lua](./example-3-json/JSON.lua)
+
 
 Detects if any of the headers (`locale`,`brand`,`systemid`,`correlationid`) are missing, tries to add the header with the value from query parameter or body json.
 
