@@ -43,14 +43,14 @@ spec:
       containers:
         - name: envoy-container
           image: envoyproxy/envoy-dev:latest
-          command: [ "/usr/local/bin/envoy", "-c", "/etc/config/envoy.yaml", "-l", "debug", "--service-cluster", "proxy" ]
+          command: [ "/usr/local/bin/envoy", "-c", "/etc/config/envoy/envoy.yaml", "-l", "debug", "--service-cluster", "proxy" ]
           ports:
             - containerPort: 80
           volumeMounts:
           - name: config-volume-lua
             mountPath: /var/lib/lua
           - name: config-volume
-            mountPath: /etc/config
+            mountPath: /etc/config/envoy
       volumes:
         - name: config-volume-lua
           configMap:

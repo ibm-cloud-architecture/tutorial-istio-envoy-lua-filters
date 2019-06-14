@@ -265,7 +265,8 @@ volumeMounts:
 Add the volume in the corresponding section in the container `proxy`
 ```yaml
 volumes:
-- configMap:
+- name: config-volume-lua
+  configMap:
     name: lua-libs
     items:
     - key: JSON.lua

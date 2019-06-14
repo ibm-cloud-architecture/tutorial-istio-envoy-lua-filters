@@ -28,8 +28,8 @@ static_resources:
             typed_config:
               "@type": type.googleapis.com/envoy.config.filter.http.lua.v2.Lua
               inline_code: |
-                JSON = (loadfile "/var/lib/JSON.lua")() -- one-time load of the routines
-                uuid = (loadfile "/var/lib/uuid.lua")() -- one-time load of the routines
+                JSON = (loadfile "/var/lib/lua/JSON.lua")() -- one-time load of the routines
+                uuid = (loadfile "/var/lib/lua/uuid.lua")() -- one-time load of the routines
                 function envoy_on_request(request_handle)
                   function urldecode(s)
                     s = s:gsub('+', ' ')
@@ -45,23 +45,22 @@ static_resources:
                     end
                     return ans
                   end
-
-                  headers = request_handle:headers()
-                  path = headers:get(":path")
-                  method = headers:get(":method")
-                  query_params = parseurl(path)
-                  content_type = headers:get("content-type")
-                  locale = headers:get("locale")
-                  brand = headers:get("brand")
-                  systemid = headers:get("systemid")
-                  correlationid = headers:get("correlationid")
-                  lua_value = {}
+                  local headers = request_handle:headers()
+                  local path = headers:get(":path")
+                  local method = headers:get(":method")
+                  local query_params = parseurl(path)
+                  local content_type = headers:get("content-type")
+                  local locale = headers:get("locale")
+                  local brand = headers:get("brand")
+                  local systemid = headers:get("systemid")
+                  local correlationid = headers:get("correlationid")
+                  local lua_value = {}
                   if content_type == "application/json" then
                     request_handle:logDebug("******* The body is application json")
-                    body = request_handle:body()
-                    body_size = body:length()
-                    body_bytes = body:getBytes(0, body_size)
-                    raw_json_text = tostring(body_bytes)
+                    local body = request_handle:body()
+                    local body_size = body:length()
+                    local body_bytes = body:getBytes(0, body_size)
+                    local raw_json_text = tostring(body_bytes)
                     lua_value = JSON:decode(raw_json_text) -- decode example
                   end
                   if locale == nil then

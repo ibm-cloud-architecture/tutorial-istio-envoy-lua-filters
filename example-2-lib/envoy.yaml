@@ -28,10 +28,9 @@ static_resources:
             typed_config:
               "@type": type.googleapis.com/envoy.config.filter.http.lua.v2.Lua
               inline_code: |
-                uuid = (loadfile "/var/lib/uuid.lua")() -- one-time load of the routines
+                uuid = (loadfile "/var/lib/lua/uuid.lua")() -- one-time load of the routines
                 function envoy_on_request(request_handle)
-                  headers = request_handle:headers()
-                  correlationid = headers:get("correlationid")
+                  local correlationid = request_handle:headers():get("correlationid")
                   if correlationid == nil then
                     request_handle:headers():replace("correlationid","GEN-"..uuid())
                   end

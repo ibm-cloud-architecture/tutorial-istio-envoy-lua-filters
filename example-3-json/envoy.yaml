@@ -28,19 +28,17 @@ static_resources:
             typed_config:
               "@type": type.googleapis.com/envoy.config.filter.http.lua.v2.Lua
               inline_code: |
-                JSON = (loadfile "/var/lib/JSON.lua")() -- one-time load of the routines
+                JSON = (loadfile "/var/lib/lua/JSON.lua")() -- one-time load of the routines
                 function envoy_on_request(request_handle)
-                  headers = request_handle:headers()
-                  correlationid = headers:get("correlationid")
-                  content_type = headers:get("content-type")
-                  lua_value = {}
-                  request_handle:logDebug("*******debug The content-type"..content_type)
+                  local correlationid = request_handle:headers():get("correlationid")
+                  local content_type = request_handle:headers():get("content-type")
+                  local lua_value = {}
                   if content_type == "application/json" then
                     request_handle:logDebug("******* The body is application json")
-                    body = request_handle:body()
-                    body_size = body:length()
-                    body_bytes = body:getBytes(0, body_size)
-                    raw_json_text = tostring(body_bytes)
+                    local body = request_handle:body()
+                    local body_size = body:length()
+                    local body_bytes = body:getBytes(0, body_size)
+                    local raw_json_text = tostring(body_bytes)
                     lua_value = JSON:decode(raw_json_text) -- decode example
                   end
                   if correlationid == nil then

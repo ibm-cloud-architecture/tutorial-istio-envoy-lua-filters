@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile-proxy
     volumes:
       - ./envoy.yaml:/etc/envoy.yaml
-      - ./JSON.lua:/var/lib/JSON.lua
-      - ./uuid.lua:/var/lib/uuid.lua
+      - ./JSON.lua:/var/lib/lua/JSON.lua
+      - ./uuid.lua:/var/lib/lua/uuid.lua
     networks:
       - envoymesh
     expose:
