@@ -256,7 +256,7 @@ Update the deployment `istio-ingressgateway` to add the lua files
 ```
 kubectl edit deployment istio-ingressgateway -n istio-system
 ```
-Add the volumenMounts in the corresponding section in the container `proxy`
+Add the volumeMounts in the corresponding section in the container `proxy`
 ```yaml
 volumeMounts:
 - mountPath: /var/lib/lua
